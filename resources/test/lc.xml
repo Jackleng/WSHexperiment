@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<caseParams>
+    <!--将所有实验案例的参数和设置通过xml文件配置-->
+
+    <!--本实验案例的基础设置-->
+    <baseSetting>
+        <!--案例的唯一标志码，可数字可汉字，也是整个案例结果保存的根目录-->
+        <caseFlag type="String" name="案例的唯一标志码">LC</caseFlag>
+        <!--本案例的基本表述，不是非空变量-->
+        <caseDescription type="String" name="案例描述">这是代码框架搭建过程中使用的测试案例</caseDescription>
+        <!--
+            true表示采用固定的随机种子，这样保证每次运行结果都相同；
+            false表示不采用，即使所有参数设置一样并且算法都收敛了，也会由于随机数的原因而使得每次运行结果有些微差别
+        -->
+        <isFixedRandomSeed type="Boolean" name="是否采用固定随机种子">True</isFixedRandomSeed>
+        <!--随机种子无所谓取多少，保证每次运行一样即可;这不是非空变量，当isFixedRandomSeed为False时该变量可不设置，此时采用当前时间作为随机种子-->
+        <fixedRandomSeed type="Integer" name="固定的随机种子">19941111</fixedRandomSeed>
+        <!--运行次数，一般为1，当需要多次运行取平均结果时可设置为其他正整数；当isFixedRandomSeed为True时，runTimes>1没有意义-->
+        <runTimes type="Integer" name="运行次数">1</runTimes>
+    </baseSetting>
+
+    <!--本实验所有数据集设置-->
+    <datasetSettings type="MultiList" name="所有数据集">
+        <datasetSetting>
+            <datasetFlag type="String" name="数据集1">数据集1</datasetFlag>
+            <datasetDescription type="String" name="数据集1描述">数据集1</datasetDescription>
+            <datasetPath type="String" name="数据集1存储地址">resources/test/汉口径流.xlsx</datasetPath>
+            <!--
+                json等格式的数据输入只需要datasetPath属性就能完全定位数据集
+                xlsx等格式的数据还需要sheetname这类属性才能完全定位
+            -->
+            <datasetSubPath type="String" name="数据集1副地址">径流</datasetSubPath>
+            <isOutputOrgData type="Boolean" name="是否保存原始数据">False</isOutputOrgData>
+            <smallDataParams>
+                <operateEnum type="Enum.SmallDataOperateEnum" name="从大数据到小数据的操作">StartAndLength</operateEnum>
+                <startIndex type="Integer" name="开始索引">1</startIndex>
+                <endIndex type="Integer" name="结束索引">None</endIndex>
+                <length type="Integer" name="小数据集长度">1000</length>
+            </smallDataParams>
+            <isOutputSmallData type="Boolean" name="是否保存小数据">True</isOutputSmallData>
+            <featureParams>
+                <featureGenerationParams>
+                    <isAdditionalGenerate type="Boolean" name="是否对现有数据列生成新特征">True</isAdditionalGenerate>
+                    <featureIndexes type="Code" name="特征列索引">
+import numpy as np
+nodeValue=np.array([0])
+#nodeValue=np.array([4])
+                    </featureIndexes>
+                    <operateEnums type="Code" name="特征生成操作枚举">
+import numpy as np
+from forecast.Feature import FeatureGenerationOperateEnum
+nodeValue=np.array([[FeatureGenerationOperateEnum.Linear] for _ in range(1)])
+#nodeValue=np.array([[FeatureGenerationOperateEnum.Linear] for _ in range(1)])
+                    </operateEnums>
+                    <transformFuncs type="Code" name="特征操作生成的函数表达式">
+import numpy as np
+nodeValue=np.array([["y=1*x+0"] for _ in range(1)])
+#nodeValue=np.array([["y=1*x+0"] for _ in range(1)])
+                    </transformFuncs>
+                    <historyIndexes type="Code" name="时间序列考虑历史前期特征">
+import numpy as np
+nodeValue = np.array([[i for i in range(1, 5)]])
+#nodeValue = np.array([[i for i in range(1, 3)]])
+                    </historyIndexes>
+                    <labelIndex type="Integer" name="特征列索引">0</labelIndex>
+                </featureGenerationParams>
+                <isOutputDatasetAfterFeatureGeneration type="Boolean" name="特征生成后是否保存数据集">True</isOutputDatasetAfterFeatureGeneration>
+                <featureSelectionParams>
+                    <isPerformSelection type="Boolean" name="是否对生成的特征进行初选">True</isPerformSelection>
+                    <operateEnums type="Code" name="特征选择操作枚举">
+import numpy as np
+from forecast.Feature import FeatureSelectionOperateEnum
+nodeValue=np.array([FeatureSelectionOperateEnum.PCC, FeatureSelectionOperateEnum.MIC])
+                    </operateEnums>
+                    <transformFuncs type="Code" name="特征选择生成的函数表达式">
+import numpy as np
+nodeValue=np.array(["and", "or"])
+                    </transformFuncs>
+                    <thresholdValues type="Code" name="每种筛选方法的阈值">
+import numpy as np
+nodeValue=np.array([0.12, 0.12])
+                    </thresholdValues>
+                </featureSelectionParams>
+                <isOutputDatasetAfterFeatureSelection type="Boolean" name="特征选择后是否保存数据集">True</isOutputDatasetAfterFeatureSelection>
+                <isOutputMetricInFeatureSelection type="Boolean" name="是否保存特征选择中计算的指标">True</isOutputMetricInFeatureSelection>
+                <featureCombinationParams>
+                    <!--除非在这一步明确知道有哪些特征才为True，相当于手动进行特征组合的筛选-->
+                    <isPerformCombination type="Boolean" name="是否进行特征组合">False</isPerformCombination>
+                    <featureFlags type="Code" name="手动设置哪些特征是否出现在特征组合的标志">nodeValue=None</featureFlags>
+                </featureCombinationParams>
+                <isOutputDatasetAfterFeatureCombination type="Boolean" name="特征组合后是否保存数据集">True</isOutputDatasetAfterFeatureCombination>
+                <featureOptimizationParams>
+                    <isPerformOptimization type="Boolean" name="是否进行特征优化">False</isPerformOptimization>
+                </featureOptimizationParams>
+                <isOutputDatasetAfterFeatureOptimization type="Boolean" name="特征优化后是否保存数据集">True</isOutputDatasetAfterFeatureOptimization>
+                <isOutputFeatureOptimizationProcess type="Boolean" name="是否保存特征优化过程">True</isOutputFeatureOptimizationProcess>
+            </featureParams>
+            <datasetParams>
+                <isNormalize type="Boolean" name="是否归一化">True</isNormalize>
+                <!--是否先归一化,是意味着训练集和验证集一起归一化；否表示训练集和验证集分开归一化-->
+                <isFirstNormalize type="Boolean" name="是否先归一化">True</isFirstNormalize>
+                <normalizeType type="String" name="归一化类型">NormalizeWithMinMax</normalizeType>
+                <separateType type="String" name="划分数据集方法">Ratio</separateType>
+                <separateValue type="Double" name="划分数据集中用到的数字">0.8</separateValue>
+                <isOutputFinalDataset type="Boolean" name="是否保存最终的数据集">True</isOutputFinalDataset>
+            </datasetParams>
+
+        </datasetSetting>
+
+    </datasetSettings>
+
+    <!--本实验所有预报模型设置-->
+    <forecastModelSettings type="MultiList" name="所有预报模型">
+        <forecastModelSetting>
+            <forecastModelParams>
+                <forecastModelEnum type="Enum.ForecastModelEnum" name="预报模型枚举">ForecastModelSWLSTM</forecastModelEnum>
+                <isPerformOptimization type="Boolean" name="是否进行超参数优化">False</isPerformOptimization>
+                <isUsingDefaultFixedHyperParameters type="Boolean" name="对于不需要优化的超参数是否采用默认值">True</isUsingDefaultFixedHyperParameters>
+                <!--当不采用固定超参数时生效-->
+                <fixedHyperParameters name="不需要优化的超参数">None</fixedHyperParameters>
+                <isUsingDefaultOptimizedHyperParameters type="Boolean" name="当不进行超参数优化时，待优化参数是否采用默认值">True</isUsingDefaultOptimizedHyperParameters>
+                <!--当不进行超参数优化同时不采用默认待优化超参数时生效-->
+                <optimizedHyperParameters name="待优化的超参数">None</optimizedHyperParameters>
+                <optimizationObjectiveEnum type="Enum.OptimizationObjectiveEnum" name="优化目标枚举">MinimizeDeterministicForecastingLoss</optimizationObjectiveEnum>
+                <isOutputHyperParametersOptimizationProcess type="Boolean" name="是否保存超参数优化过程">True</isOutputHyperParametersOptimizationProcess>
+                <isOutputFinalHyperParameters type="Boolean" name="是否保存最终超参数">True</isOutputFinalHyperParameters>
+                <isPerformProbabilisticForecasting type="Boolean" name="是否进行概率预报">False</isPerformProbabilisticForecasting>
+                <probabilisticForecastModelParams>
+                    <forecastModelEnum type="Enum.ForecastModelEnum" name="预报模型枚举">ForecastModelGPR</forecastModelEnum>
+                    <isPerformOptimization type="Boolean" name="是否进行超参数优化">True</isPerformOptimization>
+                    <isUsingDefaultFixedHyperParameters type="Boolean" name="对于不需要优化的超参数是否采用默认值">True</isUsingDefaultFixedHyperParameters>
+                    <!--当不采用固定超参数时生效-->
+                    <fixedHyperParameters name="不需要优化的超参数">None</fixedHyperParameters>
+                    <isUsingDefaultOptimizedHyperParameters type="Boolean" name="当不进行超参数优化时，待优化参数是否采用默认值">True</isUsingDefaultOptimizedHyperParameters>
+                    <!--当不进行超参数优化同时不采用默认待优化超参数时生效-->
+                    <optimizedHyperParameters name="待优化的超参数">None</optimizedHyperParameters>
+                    <optimizationObjectiveEnum type="Enum.OptimizationObjectiveEnum" name="优化目标枚举">MinimizeDeterministicForecastingLoss</optimizationObjectiveEnum>
+                    <isOutputHyperParametersOptimizationProcess type="Boolean" name="是否保存超参数优化过程">True</isOutputHyperParametersOptimizationProcess>
+                    <isOutputFinalHyperParameters type="Boolean" name="是否保存最终超参数">True</isOutputFinalHyperParameters>
+                </probabilisticForecastModelParams>
+                <isOutputDeterministicForecastingResults type="Boolean" name="是否保存确定性预报结果">True</isOutputDeterministicForecastingResults>
+                <isOutputProbabilisticForecastingResults type="Boolean" name="是否保存概率预报结果">True</isOutputProbabilisticForecastingResults>
+                <isOutputDeterministicForecastingMetrics type="Boolean" name="是否保存确定性预报结果指标">True</isOutputDeterministicForecastingMetrics>
+                <isOutputProbabilisticForecastingMetrics type="Boolean" name="是否保存概率预报结果指标">True</isOutputProbabilisticForecastingMetrics>
+                <isShowPredictionPlots type="Boolean" name="是否在运行过程中展示预测结果图">True</isShowPredictionPlots>
+                <isSavePredictionPlots type="Boolean" name="是否保存预测结果图">False</isSavePredictionPlots>
+                <labelName type="String" name="预测标签的物理含义，也是绘图的y轴名称">降雨, mm</labelName>
+                <isShowProbabilisticPlots type="Boolean" name="是否在运行过程中展示CDF和PDF图">False</isShowProbabilisticPlots>
+                <isSaveProbabilisticPlots type="Boolean" name="是否保存CDF和PDF图">True</isSaveProbabilisticPlots>
+                <isShowReliablePlots type="Boolean" name="是否在运行过程中展示PIT图">False</isShowReliablePlots>
+                <isSaveReliablePlots type="Boolean" name="是否保存PIT图">True</isSaveReliablePlots>
+            </forecastModelParams>
+        </forecastModelSetting>
+
+    </forecastModelSettings>
+
+
+</caseParams>
+
